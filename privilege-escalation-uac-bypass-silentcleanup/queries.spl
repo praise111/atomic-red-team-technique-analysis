@@ -4,8 +4,7 @@
 ## 1. Reduce Atomic Red Team framework module noise
 index="win1_log" earliest="09/28/2026:15:30:31" NOT "C:\\Users\\host1\\Documents\\WindowsPowerShell\\Modules\\Invoke-AtomicRedTeam\\2.3.0\\"
 
-## 2. Broad search for any resulting powershell/cmd process (no parent-image assumption)
-## Returned only the original batch-file execution - confirmed absence of a resulting elevated process
+## 2. Broad search for any resulting powershell/cmd process (no parent-image assumption) Returned only the original batch-file execution - confirmed absence of a resulting elevated process
 index="win1_log" earliest="09/28/2026:15:30:31" (Image="*\\powershell.exe" OR Image="*\\cmd.exe")
 | table _time, Image, ParentImage, ParentProcessId, ProcessId, CommandLine, IntegrityLevel
 
