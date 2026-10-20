@@ -1,0 +1,16 @@
+## Persistence – Startup Folder Registry Modification (T1547.001)
+## Splunk searches used during investigation
+
+## 1. Locate the reboot event to anchor the timeline
+index="win1_log" "eventcode=4"
+
+## 2. Initial (unsuccessful) search for the registry modification, anchored at reboot
+index="win1_log" "eventcode=13" "HKLM" earliest="09/25/2026:13:13:18"
+| table _time, Image, TargetObject, Details
+
+## 3. Broadened search backward to the original execution timestamp,
+##    which surfaced the PowerShell command performing the registry write
+index="win1_log" "HKLM" earliest="09/25/2026:13:10:37"
+
+## 4. Confirm post-reboot execution of the planted binary from the redirected Startup path
+index="win1_log" "eventcode=1" "calc.exe" earliest="09/25/2026:13:13:18"

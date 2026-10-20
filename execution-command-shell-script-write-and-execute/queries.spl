@@ -1,0 +1,9 @@
+## Execution – Command Shell Script Write-and-Execute (T1059.003)
+## Splunk searches used during investigation
+
+## Reduce Atomic Red Team framework noise (PowerShell console startup events)
+index="win1_log" NOT TaskCategory="PowerShell Console Startup"
+
+## Note: core lineage reconstruction was performed by inspecting ProcessId /
+## ParentProcessId / Image / CommandLine fields on individual process-creation
+## events (Sysmon EventID 1), rather than via scripted SPL.

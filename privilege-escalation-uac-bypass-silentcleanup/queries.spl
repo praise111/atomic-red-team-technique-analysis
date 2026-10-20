@@ -1,0 +1,26 @@
+## Privilege Escalation – UAC Bypass via SilentCleanup Task (T1548.002)
+## Splunk searches used during investigation
+
+## 1. Reduce Atomic Red Team framework module noise
+index="win1_log" earliest="09/28/2026:15:30:31" NOT "C:\\Users\\host1\\Documents\\WindowsPowerShell\\Modules\\Invoke-AtomicRedTeam\\2.3.0\\"
+
+## 2. Broad search for any resulting powershell/cmd process (no parent-image assumption)
+##    Returned only the original batch-file execution - confirmed absence of a resulting elevated process
+index="win1_log" earliest="09/28/2026:15:30:31" (Image="*\\powershell.exe" OR Image="*\\cmd.exe")
+| table _time, Image, ParentImage, ParentProcessId, ProcessId, CommandLine, IntegrityLevel
+
+
+## Native OS diagnostic commands (run locally on the VM, outside Splunk) --------
+
+## Task run history and last result code
+## schtasks /query /tn "\Microsoft\Windows\DiskCleanup\SilentCleanup" /v /fo list
+
+## Task full configuration (Principal / RunLevel / SecurityDescriptor)
+## schtasks /query /tn "\Microsoft\Windows\DiskCleanup\SilentCleanup" /xml
+
+## Confirm task registration / exact name
+## Get-ScheduledTask -TaskPath "\Microsoft\Windows\DiskCleanup\"
+
+## Decoded error codes:
+##   schtasks Last Result -2147020576 = 0x800710E0 "The operator or administrator has refused the request"
+##   Task Scheduler EventID 203 embedded 2147942402 = 0x80070002 ERROR_FILE_NOT_FOUND
